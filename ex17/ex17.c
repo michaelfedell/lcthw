@@ -162,6 +162,21 @@ void Database_list(struct Connection *conn)
     }
 }
 
+void Database_find(struct Connection *conn, int id, char *name) {
+    int i = id;
+    struct Database *db = conn->db;
+
+    for (i = 0; i < MAX_ROWS; i++) {
+        struct Address *cur = &db->rows[i];
+        if (cur->set)
+            if (strcmp(cur->name, name)) {
+                Address_print(cur);
+                return;
+            }
+    }
+    printf("%s not found in database\n", name);
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 3) {
@@ -209,6 +224,13 @@ int main(int argc, char *argv[])
         case 'l':
             Database_list(conn);
             break;
+
+        case 'f':   // Find entries by name
+            if(argc != 5)
+                die("Need an id to begin search and a name to find", conn);
+            Database_find(conn, id, argv[4]);
+            break;
+
         default:
             die("Invalid action: c=create, g=get, s=set, d=delete, l=list", conn);
     }
